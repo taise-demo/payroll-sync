@@ -1,0 +1,15 @@
+name: deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t payroll-sync:${{ github.sha }} .
+      - name: Push and deploy
+        env:
+          AWS_ROLE: ${{ secrets.DEPLOY_ROLE_ARN }}
+        run: ./scripts/deploy.sh payroll-sync:${{ github.sha }}
